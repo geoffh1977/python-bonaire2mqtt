@@ -1,0 +1,23 @@
+# Generate Base Python 3 Image
+FROM alpine:3 as base
+
+RUN apk --no-cache -U add python3 && \
+  ln -s /usr/bin/python3 /usr/bin/python
+
+# Use Base To Generate Builder Image
+FROM base as builder
+
+RUN mkdir /install
+WORKDIR /install
+COPY app/requirements.txt /requirements.txt
+RUN python3 -m ensurepip && \
+  pip3 install --prefix=/install -r /requirements.txt
+
+# Build Final Application Image
+FROM base
+
+LABEL maintainer="Geoffrey Harrison <geoffh1977@gmail.com>"
+COPY --from=builder /install /usr
+COPY app /app/
+WORKDIR /app
+CMD ["python", "./climate.py"]

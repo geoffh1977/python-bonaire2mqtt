@@ -1,0 +1,32 @@
+### Download QEMU Binaries For Cloud Build
+FROM alpine:3 AS qemu
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-aarch64.tar.gz
+
+# hadolint ignore=DL3018,DL3019,DL4006
+RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
+
+### Generate Base Python 3 Image
+FROM arm32v7/alpine:3 as base
+
+COPY --from=builder qemu-aarch64-static /usr/bin
+
+RUN apk --no-cache -U add python3 && \
+  ln -s /usr/bin/python3 /usr/bin/python
+
+### Use Base To Generate Builder Image
+FROM base as builder
+
+RUN mkdir /install
+WORKDIR /install
+COPY app/requirements.txt /requirements.txt
+RUN python3 -m ensurepip && \
+  pip3 install --prefix=/install -r /requirements.txt
+
+### Build Final Application Image
+FROM base
+
+LABEL maintainer="Geoffrey Harrison <geoffh1977@gmail.com>"
+COPY --from=builder /install /usr
+COPY app /app/
+WORKDIR /app
+CMD ["python", "./climate.py"]
