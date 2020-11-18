@@ -8,7 +8,7 @@ RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
 ### Generate Base Python 3 Image
 FROM arm32v7/alpine:3 as base
 
-COPY --from=qemu qemu-aarch64-static /usr/bin
+COPY --from=qemu qemu-arm-static /usr/bin
 
 RUN apk --no-cache -U add python3 && \
   ln -s /usr/bin/python3 /usr/bin/python
