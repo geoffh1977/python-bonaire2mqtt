@@ -252,7 +252,7 @@ class BonairePyClimate():
                 # Wait for 7 seconds for a response to the discovery broadcast
                 await asyncio.sleep(7)
 
-            await asyncio.sleep(3600)
+            await asyncio.sleep(220)
 
             self._connected = False
             self._server_transport.write(DELETE.encode())
