@@ -1,0 +1,11 @@
+image: geoffh1977/bonaire2mqtt:develop
+manifests:
+  - image: geoffh1977/bonaire2mqtt:develop-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: geoffh1977/bonaire2mqtt:develop-arm64v8
+    platform:
+      architecture: arm64
+      os: linux
+      variant: v8

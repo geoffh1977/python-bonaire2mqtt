@@ -6,9 +6,18 @@ chmod +x ./manifest-tool
 
 IMAGE_MISSING="false"
 
+# Configure Branch Variables
+if [ "${SOURCE_BRANCH}" = "main" ]
+then
+  MANIFEST_FILE=manifest.yaml
+elif [ "${SOURCE_BRANCH}" = "develop" ]
+then
+  MANIFEST_FILE=dev-manifest.yaml
+fi
+
 # Check If All Images Are Available
 echo
-for IMAGE_TAG in $(ls Dockerfile.* | cut -d"." -f2)
+for IMAGE_TAG in $(grep "\- image:" ${MANIFEST_FILE} | cut -d":" -f 3)
 do
   if ./manifest-tool inspect "${DOCKER_REPO}:${IMAGE_TAG}" 2> /dev/null
   then
@@ -23,7 +32,7 @@ echo
 # Push Manifest File If All Images Available
 if [ "${IMAGE_MISSING}" = "false" ]
 then
-  ./manifest-tool push from-spec manifest.yaml
+  ./manifest-tool push from-spec ${MANIFEST_FILE}
 fi
 
 # Clean Up
