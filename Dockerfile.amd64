@@ -1,7 +1,7 @@
 # Generate Base Python 3 Image
 FROM alpine:3 as base
 
-RUN apk --no-cache -U add python3 && \
+RUN apk --no-cache -U add python3 tini && \
   ln -s /usr/bin/python3 /usr/bin/python
 
 # Use Base To Generate Builder Image
@@ -20,4 +20,5 @@ LABEL maintainer="Geoffrey Harrison <geoffh1977@gmail.com>"
 COPY --from=builder /install /usr
 COPY app /app/
 WORKDIR /app
-CMD ["python", "./climate.py"]
+ENTRYPOINT ["tini", "--"]
+CMD ["python", "./bonaire2mqtt.py"]
